@@ -8,19 +8,6 @@ import matplotlib.pyplot as plt
 st.set_page_config(layout="wide")
 
 df = pd.read_csv('jobs_in_data.csv')
-
-
-def home_page():
-    columns = st.columns([3, 1, 2])  
-    title_col = columns[0]
-
-    title_col.title(" :female-technologist: JOBS IN DATA")
-    st.markdown('<style>div.block-container{padding-top:1rem;}</style>',unsafe_allow_html=True)
-
-    st.write('DATA SCIENCE')
-    st.write('Nur Afifah Nabilah Binti Ahmad Yani')
-    st.write('22FTT1356')
-    st.write('DDAS02')
     
 
 def main_dashboard():
@@ -65,8 +52,6 @@ def main_dashboard():
         else:
             st.write("No data available for the selected filters!")
 
-
-
     # Visualization 02
     with st.expander("Salary based on Job Category"):
         plt.figure(figsize=figsize_bar)
@@ -97,10 +82,11 @@ def main_dashboard():
         else:
             st.write("No data available for the selected filters!")
 
+
     # Visualization 03
-    with st.expander("Salary based on Entry Level"):
-        plt.figure(figsize=figsize_line)
-        selected_experience_level = st.multiselect("Select Entry Level:", df["experience_level"].unique())
+    with st.expander("Salary based on Company Size"):
+        plt.figure(figsize=figsize_bar)
+        selected_company_size = st.multiselect("Select Company Size:", df["company_size"].unique())
 
         st.write('')
         col1, col2 = st.columns(2)
@@ -110,6 +96,37 @@ def main_dashboard():
 
         with col2:
             location = st.selectbox("Location 03", df["company_location"].unique())
+
+        if selected_titles: 
+            filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location) & (df['company_size'].isin(selected_company_size))]
+        else:  
+            filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location)]
+
+        if not filtered_df.empty:
+            company_size = filtered_df.groupby('company_size')['salary_in_usd'].mean().sort_values(ascending=False)
+            sns.barplot(y=company_size.values, x=company_size.index)
+            plt.xlabel('Company Size')  
+            plt.ylabel('Salary')
+            plt.grid(True, alpha=0.3)
+            st.pyplot(plt)
+            plt.close()
+        else:
+            st.write("No data available for the selected filters!")
+
+
+    # Visualization 04
+    with st.expander("Salary based on Entry Level"):
+        plt.figure(figsize=figsize_line)
+        selected_experience_level = st.multiselect("Select Entry Level:", df["experience_level"].unique())
+
+        st.write('')
+        col1, col2 = st.columns(2)
+
+        with col1:
+            year = st.radio("Year 04", df["work_year"].unique())
+
+        with col2:
+            location = st.selectbox("Location 04", df["company_location"].unique())
 
         if selected_titles: 
             filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location) & (df['experience_level'].isin(selected_experience_level))]
@@ -127,7 +144,7 @@ def main_dashboard():
         else:
             st.write("No data available for the selected filters!")
 
-    # Visualization 04
+    # Visualization 05
     with st.expander("Salary based on Work Setting"):
         plt.figure(figsize=figsize_line)
         selected_work_setting = st.multiselect("Select Work Setting:", df["work_setting"].unique())
@@ -136,10 +153,10 @@ def main_dashboard():
         col1, col2 = st.columns(2)
 
         with col1:
-            year = st.radio("Year 04", df["work_year"].unique())
+            year = st.radio("Year 05", df["work_year"].unique())
 
         with col2:
-            location = st.selectbox("Location 04", df["company_location"].unique())
+            location = st.selectbox("Location 05", df["company_location"].unique())
 
         if selected_titles: 
             filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location) & (df['work_setting'].isin(selected_work_setting))]
@@ -157,38 +174,10 @@ def main_dashboard():
         else:
             st.write("No data available for the selected filters!")
 
-    # Visualization 05
-    with st.expander("Salary based on Employment Type"):
-        plt.figure(figsize=figsize_pie)
-        selected_employment_type = st.multiselect("Select Employment type:", df["employment_type"].unique())
-
-        st.write('')
-        col1, col2 = st.columns(2)
-
-        with col1:
-            year = st.radio("Year 05", df["work_year"].unique())
-
-        with col2:
-            location = st.selectbox("Location 05", df["company_location"].unique())
-
-        if selected_titles: 
-            filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location) & (df['work_year'].isin(selected_work_year))]
-        else:  
-            filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location)]
-
-        if not filtered_df.empty:
-            employment_type_salary = filtered_df.groupby('employment_type')['salary_in_usd'].mean().sort_values(ascending=False)
-            plt.pie(employment_type_salary.values, labels=employment_type_salary.index, autopct='%1.1f%%', startangle=140)
-            plt.axis('equal')
-            st.pyplot(plt)
-            plt.close()
-        else:
-            st.write("No data available for the selected filters!")
-
     # Visualization 06
-    with st.expander("Salary based on Company Size"):
-        plt.figure(figsize=figsize_pie)
-        selected_company_size = st.multiselect("Select Company Size:", df["company_size"].unique())
+    with st.expander("Salary based on Employment Type"):
+        plt.figure(figsize=figsize_line)
+        selected_employment_type = st.multiselect("Select employment type:", df["employment_type"].unique())
 
         st.write('')
         col1, col2 = st.columns(2)
@@ -200,14 +189,16 @@ def main_dashboard():
             location = st.selectbox("Location 06", df["company_location"].unique())
 
         if selected_titles: 
-            filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location) & (df['company_size'].isin(selected_company_size))]
+            filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location) & (df['employment_type'].isin(selected_employment_type))]
         else:  
             filtered_df = df[(df['work_year'] == year) & (df['company_location'] == location)]
 
         if not filtered_df.empty:
-            company_size_salary = filtered_df.groupby('company_size')['salary_in_usd'].mean().sort_values(ascending=False)
-            plt.pie(company_size_salary.values, labels=company_size_salary.index, autopct='%1.1f%%', startangle=140)
-            plt.axis('equal')
+            employment_type_salary = filtered_df.groupby('employment_type')['salary_in_usd'].mean().sort_values(ascending=False)
+            sns.lineplot(x=employment_type_salary.index, y=employment_type_salary.values) 
+            plt.xlabel('Employment Type')
+            plt.ylabel('Salary')
+            plt.grid(True, alpha=0.3)
             st.pyplot(plt)
             plt.close()
         else:
@@ -216,7 +207,8 @@ def main_dashboard():
 
 
 
-def other_dashboard():
+
+def general_dashboard():
     columns = st.columns([3, 1, 2])  
     title_col = columns[0]
 
@@ -330,11 +322,10 @@ def other_dashboard():
             st.write("")
 
 pages = {
-    "Data Science": home_page,
     "Main Dashboard": main_dashboard,
-    "Other Dashboard": other_dashboard
+    "General Dashboard": general_dashboard
 }
 
-selection = st.sidebar.radio("JOBS IN DATA:", list(pages.keys()))
+selection = st.sidebar.radio("Go To:", list(pages.keys()))
 
 pages[selection]()
